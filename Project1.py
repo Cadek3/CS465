@@ -18,7 +18,22 @@ def rastrigin(x):
 
 def griewangk(x):
     return sum(x**2 / 4000) - np.prod(np.cos(x / np.sqrt(np.arange(1, len(x) + 1)))) + 1
+    
+#added the other 5 functions
+def sine_envelope_sine(x):
+    return - sum(0.5 + ((np.sin(x[i]**2 + x[i+1]**2 - 0.5)**2)/(1 + 0.001 * (x[i]**2 + x[i+1]**2))**2))
 
+def stretched_V_sine(x):
+    return sum(([i]**2 + x[i+1]**2)**0.25 * np.sin(50 * (x[i]**2 + x[i+1]**2)**0.1)**2 + 1)
+
+def ackleys_one(x):
+    return sum((1/(math.e**0.2)) * (np.sqrt(x[i]**2 + x[i+1]**2)) + 3 * (np.cos(2 * x[i]) + np.sin(2 * x[i+1])))
+
+def ackleys_two(x):
+    return sum(20 + math.e - (20/(math.e**(0.2 * np.sqrt((x[i]**2 + x[i+1]**2)/2)))) - math.e**(0.5 * (np.cos((2 * np.pi) * x[i])) + np.cos((2 * np.pi) * x[i+1])))
+
+def egg_holder(x):
+    return sum(-x[i] * np.sin(np.sqrt(np.abs(x[i] - x[i+1] - 47))) - (x[i+1] + 47) * np.sin(np.sqrt(np.abs(x[i+1] + 47 + (x[i]/2)))))
 
 # Generate Pseudo-random Solution Vectors
 def generate_solution_vectors(method, dim=30, num_vectors=30):
