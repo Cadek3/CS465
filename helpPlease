@@ -1,0 +1,20 @@
+def gradient_descent(start_x, start_y, learning_rate, num_iterations):
+    # Initialize the parameters
+    x = start_x
+    y = start_y
+    history = []
+    
+    # Perform the gradient descent iterations
+    for i in range(num_iterations):
+        # Calculate the gradients
+        grad_x = df_dx(x, y)
+        grad_y = df_dy(x, y)
+        
+        # Update the parameters
+        x = x - learning_rate * grad_x
+        y = y - learning_rate * grad_y
+        
+        # Save the history of the parameters
+        history.append((x, y, f(x, y)))
+    
+    return x, y, f(x, y), history
