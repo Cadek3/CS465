@@ -81,8 +81,7 @@ def generate_solution_vectors(method, dim=30, num_vectors=30):
         # Generate solution vectors between -500 and 500
         solution_vectors = np.random.randint(-500, 501, (num_vectors, dim), dtype=np.int32)
         
-        print("Random Solution Vectors:")
-        print(solution_vectors)
+       
 
         # Cast the solution vectors to float64 for calculations
         return solution_vectors.astype(np.float64)
