@@ -155,4 +155,37 @@ functions = ["Schwefel", "De Jong 1", "Rosenbrock's Saddle", "Rastrigin", "Griew
 for func_name, time_value in zip(functions, times):
     print(f"{func_name}: {time_value} milliseconds")
 
+print()
+# Benchmark Functions
+def schwefel_optimized(x):
+    return np.sum(-x * np.sin(np.abs(x)**0.5))
 
+print("Attempting Gradient Descent on Schwefel")
+# ATTEMPTING
+# Gradient Descent Function
+def gradient_descent(start_x, learning_rate, num_iterations, df_dx, f):
+    x = start_x
+    history = []
+    for i in range(num_iterations):
+        grad_x = df_dx(x)
+        x = x - learning_rate * grad_x
+        history.append((x, f(x)))
+    return x, f(x), history
+
+# Define the objective function (Schwefel function)
+def f(x):
+    return schwefel_optimized(x)
+
+# Define the derivative of the Schwefel function
+def df_dx_schwefel(x):
+    return 2 * x * np.sin(np.abs(x)**0.5) - np.sign(x) * np.cos(np.abs(x)**0.5) * np.sqrt(np.abs(x))
+
+# Apply gradient descent to optimize the Schwefel function
+start_x = 400
+learning_rate = 0.01
+num_iterations = 1000
+
+final_x, min_value, history = gradient_descent(start_x, learning_rate, num_iterations, df_dx_schwefel, f)
+
+print("Optimized value of x:", final_x)
+print("Minimum value:", min_value)
