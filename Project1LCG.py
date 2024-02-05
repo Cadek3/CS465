@@ -73,7 +73,7 @@ def egg_holder(x):
         result += -x[i] * np.sin(np.sqrt(np.abs(x[i] - x[i+1] - 47))) - (x[i+1] + 47) * np.sin(np.sqrt(np.abs(x[i+1] + 47 + x[i]/2)))
     return result
 
-#generate random number vector using LCG method
+# Generate random number vector using LCG method
 def linear_congruential_generator(seed, multi, inc, modu, dim):
     random = []
     current = seed
@@ -81,32 +81,36 @@ def linear_congruential_generator(seed, multi, inc, modu, dim):
     for _ in range(dim):
         current = (multi * current + inc) % modu
         new = 10 + (current / modu) * (100 - 10)
-        random.append(int(new))
+        random.append(new)
 
-    return random
+    return np.array(random)
+
 
 # Solve Benchmark Functions for Solution Vectors
-def solve_functions(result):
-    
+def solve_functions(solution_vectors):
     functions = [schwefel, de_jong_1, rosenbrocks_saddle, rastrigin, griewangk,
                  sine_envelope_sine, stretch_v_sine_wave, ackley_one, ackley_two, egg_holder]
-    
+
     # Initialize an array to store the results of function evaluations
-    results = np.zeros((len(functions), len(random)), dtype=np.float64)
+    results = np.zeros((len(functions), len(solution_vectors)), dtype=np.float64)
+    times = np.zeros((len(functions),), dtype=np.float64)
     
     # Iterate over each function and each solution vector
     for i, func in enumerate(functions):
-        
-        for j, solution in enumerate(random):
+        start_time = time.time()  # Capture start time
+        for j, solution in enumerate(solution_vectors):
             # Evaluate the function for the current solution vector
             results[i, j] = func(solution)
+        end_time = time.time()  # Capture end time
+        times[i] = (end_time - start_time) * 1000  # Convert to milliseconds and store time taken
+    
+    return results, times
 
-    return results
 
 
 # Function to compute Statistical Analysis
 def compute_statistics(results):
-    
+   
     functions = ["Schwefel", "De Jong 1", "Rosenbrock's Saddle", "Rastrigin", "Griewangk",
                  "Sine Envelope Sine Wave", "Stretch V Sine Wave", "Ackley One", "Ackley Two", "Egg Holder"]
     
@@ -125,17 +129,14 @@ def compute_statistics(results):
 
     return statistics
 
-# Generate solution vectors using the LCG method
-random = linear_congruential_generator(seed = 42, multi = 1664525, inc = 1013904223, modu = 2**32, dim = 30)
+# Generate solution vectors using the Linear Congruential Generator (LCG) method
+current_time_seed = int(time.time())
+random_vectors = [linear_congruential_generator(seed=current_time_seed + i, multi=1664525, inc=1013904223, modu=2**32, dim=30) for i in range(30)]
 
-# Capture start time before solving the benchmark functions
-start_time = time.time()
 
 # Solve the benchmark functions for the generated solution vectors
-results = solve_functions(random)
+results, times = solve_functions(random_vectors)
 
-# Capture end time after solving the benchmark functions
-end_time = time.time()
 
 # Compute statistical analysis 
 statistics = compute_statistics(results)
@@ -148,5 +149,9 @@ for func_name, stats in statistics.items():
         print(f"{stat}: {value}")
     print()
 
-
-print(f"Time taken: {end_time - start_time} seconds")
+# Print time taken for each function
+print("\nTime taken for each function (milliseconds):")
+functions = ["Schwefel", "De Jong 1", "Rosenbrock's Saddle", "Rastrigin", "Griewangk",
+             "Sine Envelope Sine Wave", "Stretch V Sine Wave", "Ackley One", "Ackley Two", "Egg Holder"]
+for func_name, time_value in zip(functions, times):
+    print(f"{func_name}: {time_value} milliseconds")

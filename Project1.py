@@ -76,13 +76,12 @@ def egg_holder(x):
 # Generate Pseudo-random Solution Vectors
 def generate_solution_vectors(method, dim=30, num_vectors=30):
     if method == "mersenne_twister":
-        np.random.seed(42)  # DELETE once done testing!!!!!!
+        np.random.seed(42)  # chosen seed
  
         # Generate solution vectors between -500 and 500
         solution_vectors = np.random.randint(-500, 501, (num_vectors, dim), dtype=np.int32)
-        
-       
 
+        
         # Cast the solution vectors to float64 for calculations
         return solution_vectors.astype(np.float64)
     else:
@@ -96,15 +95,18 @@ def solve_functions(solution_vectors):
     
     # Initialize an array to store the results of function evaluations
     results = np.zeros((len(functions), len(solution_vectors)), dtype=np.float64)
+    times = np.zeros((len(functions),), dtype=np.float64)
     
     # Iterate over each function and each solution vector
     for i, func in enumerate(functions):
-        
+        start_time = time.time()
         for j, solution in enumerate(solution_vectors):
             # Evaluate the function for the current solution vector
             results[i, j] = func(solution)
+        end_time = time.time()
+        times[i] = (end_time - start_time) * 1000  # Convert to milliseconds
 
-    return results
+    return results, times
 
 
 # Function to compute Statistical Analysis
@@ -129,18 +131,10 @@ def compute_statistics(results):
     return statistics
 
 # Generate solution vectors using the Mersenne Twister method
-# dim: The dimensionality of each solution vector 
-# num_vectors: The number of solution vectors to generater
 solution_vectors = generate_solution_vectors(method="mersenne_twister", dim=30, num_vectors=30)
 
-# Capture start time before solving the benchmark functions
-start_time = time.time()
-
 # Solve the benchmark functions for the generated solution vectors
-results = solve_functions(solution_vectors)
-
-# Capture end time after solving the benchmark functions
-end_time = time.time()
+results, times = solve_functions(solution_vectors)
 
 # Compute statistical analysis 
 statistics = compute_statistics(results)
@@ -154,4 +148,11 @@ for func_name, stats in statistics.items():
     print()
 
 
-print(f"Time taken: {end_time - start_time} seconds")
+# Print time taken for each function
+print("\nTime taken for each function (milliseconds):")
+functions = ["Schwefel", "De Jong 1", "Rosenbrock's Saddle", "Rastrigin", "Griewangk",
+             "Sine Envelope Sine Wave", "Stretch V Sine Wave", "Ackley One", "Ackley Two", "Egg Holder"]
+for func_name, time_value in zip(functions, times):
+    print(f"{func_name}: {time_value} milliseconds")
+
+
