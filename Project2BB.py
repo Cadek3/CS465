@@ -119,7 +119,7 @@ print("Applying Branch and Bound to solve STSP. . .\n")
 best_tour, best_distance = stsp_branch_and_bound(cities)
 print()
 print("Optimal Tour:", best_tour)
-print("Optimal Distance:", best_distance)
+print("Optimal Distance:", best_tour + [best_tour[0]])
 print()
 
 # Using Branch and Bound to Solve ATSP
@@ -129,5 +129,5 @@ cities = [(0, 0), (1, 2), (3, 1), (2, 3)]
 best_tour, best_distance = atsp_branch_and_bound(cities)
 
 print()
-print("Optimal Tour:", best_tour)
+print("Optimal Tour:", best_tour + [best_tour[0]])
 print("Optimal Distance:", best_distance)
