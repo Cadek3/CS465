@@ -48,12 +48,13 @@ def fcf_schedule(tables):
         tables: A list of table types to be scheduled.
 
     Returns:
-        A tuple containing a dictionary of completion times for each table and 
-        the Makespan (total completion time).
+        A tuple containing a dictionary of completion times for each table, the Makespan
+        (total completion time), and the sequence of tables processed.
     """
     completion_times = {}  # Dictionary to store completion times for each table
     current_time = start_time
     current_machine = machine_order[0]  # Start with the first machine (Saw)
+    sequence = []  # List to store the sequence of tables processed
 
     for table in tables:
         completion_time = get_completion_time(table, current_machine, current_time)
@@ -64,6 +65,7 @@ def fcf_schedule(tables):
             completion_time = start_time + 8  # Set completion time to workday end
 
         completion_times[table] = completion_time
+        sequence.append(table)
 
         # Update current time and machine for the next table
         current_time = completion_time
@@ -71,7 +73,7 @@ def fcf_schedule(tables):
 
     # Calculate Makespan (completion time of the last table)
     makespan = max(completion_times.values())
-    return completion_times, makespan
+    return completion_times, makespan, sequence
 
 # Function to schedule tables using Round Robin (RR) algorithm
 def rr_schedule(tables, time_quantum):
@@ -94,12 +96,13 @@ def rr_schedule(tables, time_quantum):
         time_quantum: The time quantum for the Round Robin algorithm.
 
     Returns:
-        A tuple containing a dictionary of completion times for each table and 
-        the Makespan (total completion time).
+        A tuple containing a dictionary of completion times for each table, the Makespan
+        (total completion time), and the sequence of tables processed.
     """
     completion_times = {}  # Dictionary to store completion times for each table
     current_time = start_time
     current_machine = machine_order[0]  # Start with the first machine (Saw)
+    sequence = []  # List to store the sequence of tables processed
 
     while tables:
         for table in tables[:]:
@@ -108,6 +111,7 @@ def rr_schedule(tables, time_quantum):
                 print(f"Warning: Workday exceeded for table {table}")
                 completion_time = start_time + 8  # Set completion time to workday end
             completion_times[table] = completion_time
+            sequence.append(table)
             current_time = min(completion_time, start_time + 8)  # Update current time
             current_machine = machine_order[1] if current_machine == machine_order[0] else machine_order[0]  # Switch machine
             tables.remove(table)  # Remove the table from the list once completed
@@ -117,7 +121,7 @@ def rr_schedule(tables, time_quantum):
 
     # Calculate Makespan (completion time of the last table)
     makespan = max(completion_times.values())
-    return completion_times, makespan
+    return completion_times, makespan, sequence
 
 # Function to schedule tables using Shortest Job First (SJF) algorithm
 def sjf_schedule(tables):
@@ -139,17 +143,16 @@ def sjf_schedule(tables):
         tables: A list of table types to be scheduled.
 
     Returns:
-        A tuple containing a dictionary of completion times for each table and 
-        the Makespan (total completion time).
+        A tuple containing a dictionary of completion times for each table, the Makespan
+        (total completion time), and the sequence of tables processed.
     """
-    
     completion_times = {}  # Dictionary to store completion times for each table
     current_time = start_time
     current_machine = machine_order[0]  # Start with the first machine (Saw)
+    sequence = []  # List to store the sequence of tables processed
 
     # Sort tables based on processing times
     tables.sort(key=lambda table: processing_times[table][machine_order.index(current_machine)])
-    
 
     for table in tables:
         completion_time = get_completion_time(table, current_machine, current_time)
@@ -160,6 +163,7 @@ def sjf_schedule(tables):
             completion_time = start_time + 8  # Set completion time to workday end
 
         completion_times[table] = completion_time
+        sequence.append(table)
 
         # Update current time and machine for the next table
         current_time = completion_time
@@ -168,7 +172,7 @@ def sjf_schedule(tables):
     # Calculate Makespan based on the sorted tables
     makespan = max(completion_times.values(), default=0)  # Handle empty completion_times
     
-    return completion_times, makespan
+    return completion_times, makespan, sequence
 
 # Sample list of tables to be processed
 tables = ["Table A", "Table B", "Table C"]
@@ -178,22 +182,25 @@ rr_tables = tables.copy()
 sjf_tables = tables.copy()
 
 # Schedule tables using FCFS and print results
-completion_times, makespan = fcf_schedule(tables)
+fcf_completion_times, fcf_makespan, fcf_sequence = fcf_schedule(tables)
 print("Completion Times (FCFS):")
-for table, time in completion_times.items():
-    print(f"{table}: {time}")
-print(f"\nMakespan (FCFS): {makespan}\n")
+for table in fcf_sequence:
+    print(f"{table}: {fcf_completion_times[table]}")
+print(f"\nMakespan (FCFS): {fcf_makespan}")
+print(f"Sequence (FCFS): {fcf_sequence}\n")
 
 # Schedule tables using Round Robin (RR) with a time quantum of 1 hour and print results
-rr_completion_times, rr_makespan = rr_schedule(rr_tables, time_quantum=1)
+rr_completion_times, rr_makespan, rr_sequence = rr_schedule(rr_tables, time_quantum=1)
 print("Completion Times (Round Robin):")
-for table, time in rr_completion_times.items():
-    print(f"{table}: {time}")
-print(f"\nMakespan (Round Robin): {rr_makespan}\n")
+for table in rr_sequence:
+    print(f"{table}: {rr_completion_times[table]}")
+print(f"\nMakespan (Round Robin): {rr_makespan}")
+print(f"Sequence (Round Robin): {rr_sequence}\n")
 
 # Schedule tables using Shortest Job First (SJF) and print results
-sjf_completion_times, sjf_makespan = sjf_schedule(sjf_tables)
+sjf_completion_times, sjf_makespan, sjf_sequence = sjf_schedule(sjf_tables)
 print("Completion Times (Shortest Job First):")
-for table, time in sjf_completion_times.items():
-    print(f"{table}: {time}")
-print(f"\nMakespan (Shortest Job First): {sjf_makespan}\n")
+for table in sjf_sequence:
+    print(f"{table}: {sjf_completion_times[table]}")
+print(f"\nMakespan (Shortest Job First): {sjf_makespan}")
+print(f"Sequence (Shortest Job First): {sjf_sequence}\n")
