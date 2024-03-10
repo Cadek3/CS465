@@ -147,9 +147,9 @@ def sjf_schedule(tables):
     current_machine = machine_order[0]  # Start with the first machine (Saw)
 
     # Sort tables based on processing times
-    sorted_tables = sorted(tables, key=lambda table: sum(processing_times[table]))
+    tables.sort(key=lambda table: sum(processing_times[table]))
 
-    for table in sorted_tables:
+    for table in tables:
         completion_time = get_completion_time(table, current_machine, current_time)
 
         # Check if workday is exceeded
@@ -163,8 +163,8 @@ def sjf_schedule(tables):
         current_time = completion_time
         current_machine = machine_order[1] if current_machine == machine_order[0] else machine_order[0]
 
-    # Calculate Makespan (completion time of the last table)
-    makespan = max(completion_times.values())
+    # Calculate Makespan based on the sorted tables
+    makespan = max(completion_times.values(), default=0)  # Handle empty completion_times
     return completion_times, makespan
 
 # Sample list of tables to be processed
