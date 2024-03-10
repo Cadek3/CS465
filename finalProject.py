@@ -142,12 +142,14 @@ def sjf_schedule(tables):
         A tuple containing a dictionary of completion times for each table and 
         the Makespan (total completion time).
     """
+    
     completion_times = {}  # Dictionary to store completion times for each table
     current_time = start_time
     current_machine = machine_order[0]  # Start with the first machine (Saw)
 
     # Sort tables based on processing times
-    tables.sort(key=lambda table: sum(processing_times[table]))
+    tables.sort(key=lambda table: processing_times[table][machine_order.index(current_machine)])
+    
 
     for table in tables:
         completion_time = get_completion_time(table, current_machine, current_time)
@@ -165,10 +167,15 @@ def sjf_schedule(tables):
 
     # Calculate Makespan based on the sorted tables
     makespan = max(completion_times.values(), default=0)  # Handle empty completion_times
+    
     return completion_times, makespan
 
 # Sample list of tables to be processed
 tables = ["Table A", "Table B", "Table C"]
+
+# Make a copy of the tables list before passing it to RR and SJF functions
+rr_tables = tables.copy()
+sjf_tables = tables.copy()
 
 # Schedule tables using FCFS and print results
 completion_times, makespan = fcf_schedule(tables)
@@ -178,14 +185,14 @@ for table, time in completion_times.items():
 print(f"\nMakespan (FCFS): {makespan}\n")
 
 # Schedule tables using Round Robin (RR) with a time quantum of 1 hour and print results
-rr_completion_times, rr_makespan = rr_schedule(tables, time_quantum=1)
+rr_completion_times, rr_makespan = rr_schedule(rr_tables, time_quantum=1)
 print("Completion Times (Round Robin):")
 for table, time in rr_completion_times.items():
     print(f"{table}: {time}")
 print(f"\nMakespan (Round Robin): {rr_makespan}\n")
 
 # Schedule tables using Shortest Job First (SJF) and print results
-sjf_completion_times, sjf_makespan = sjf_schedule(tables)
+sjf_completion_times, sjf_makespan = sjf_schedule(sjf_tables)
 print("Completion Times (Shortest Job First):")
 for table, time in sjf_completion_times.items():
     print(f"{table}: {time}")
